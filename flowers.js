@@ -1,141 +1,112 @@
+console.log("Flowers loaded!");
+
 const flowers=[];
 
 class Flower{
 
-constructor(){
+    constructor(){
 
-this.x=Math.random()*w;
+        this.x=Math.random()*w;
+        this.y=h-40-Math.random()*250;
 
-this.y=h-40-Math.random()*250;
+        this.scale=Math.random()*0.4+0.5;
 
-this.scale=Math.random()*0.4+0.5;
+        this.bloom=0;
+        this.delay=Math.random()*400;
+        this.swing=Math.random()*Math.PI*2;
 
-this.bloom=0;
+        this.color=[
+            "#ffd166",
+            "#d8b4fe",
+            "#c4b5fd",
+            "#ffffff",
+            "#93c5fd"
+        ][Math.floor(Math.random()*5)];
 
-this.delay=Math.random()*400;
+    }
 
-this.swing=Math.random()*Math.PI*2;
+    update(){
 
-this.color=[
-"#ffd166",
-"#d8b4fe",
-"#c4b5fd",
-"#ffffff",
-"#93c5fd"
-][Math.floor(Math.random()*5)];
+        if(this.delay>0){
+            this.delay--;
+            return;
+        }
 
-}
+        if(this.bloom<1){
+            this.bloom+=0.003;
+        }
 
-update(){
+        this.swing+=0.01;
 
-if(this.delay>0){
+    }
 
-this.delay--;
+    draw(){
 
-return;
+        ctx.save();
 
-}
+        ctx.translate(
+            this.x+Math.sin(this.swing)*6,
+            this.y
+        );
 
-if(this.bloom<1){
+        ctx.scale(this.scale,this.scale);
 
-this.bloom+=0.003;
+        ctx.strokeStyle="#335544";
+        ctx.lineWidth=3;
 
-}
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(0,100);
+        ctx.stroke();
 
-this.swing+=0.01;
+        for(let i=0;i<8;i++){
 
-}
+            ctx.save();
 
-draw(){
+            ctx.rotate((Math.PI*2/8)*i);
 
-ctx.save();
+            ctx.scale(this.bloom,this.bloom);
 
-ctx.translate(
+            ctx.fillStyle=this.color;
 
-this.x+Math.sin(this.swing)*6,
+            ctx.beginPath();
 
-this.y
+            ctx.ellipse(
+                0,
+                -20,
+                12,
+                28,
+                0,
+                0,
+                Math.PI*2
+            );
 
-);
+            ctx.fill();
 
-ctx.scale(this.scale,this.scale);
+            ctx.restore();
 
-ctx.strokeStyle="#335544";
+        }
 
-ctx.lineWidth=3;
+        ctx.fillStyle="#fff7c7";
 
-ctx.beginPath();
+        ctx.beginPath();
+        ctx.arc(0,0,10*this.bloom,0,Math.PI*2);
+        ctx.fill();
 
-ctx.moveTo(0,0);
+        ctx.restore();
 
-ctx.lineTo(0,100);
-
-ctx.stroke();
-
-for(let i=0;i<8;i++){
-
-ctx.save();
-
-ctx.rotate((Math.PI*2/8)*i);
-
-ctx.scale(this.bloom,this.bloom);
-
-ctx.fillStyle=this.color;
-
-ctx.beginPath();
-
-ctx.ellipse(
-
-0,
-
--20,
-
-12,
-
-28,
-
-0,
-
-0,
-
-Math.PI*2
-
-);
-
-ctx.fill();
-
-ctx.restore();
-
-}
-
-ctx.fillStyle="#fff7c7";
-
-ctx.beginPath();
-
-ctx.arc(0,0,10*this.bloom,0,Math.PI*2);
-
-ctx.fill();
-
-ctx.restore();
-
-}
+    }
 
 }
 
 for(let i=0;i<25;i++){
-
-flowers.push(new Flower());
-
+    flowers.push(new Flower());
 }
 
 function updateFlowers(){
-
-flowers.forEach(f=>f.update());
-
+    flowers.forEach(f=>f.update());
 }
 
 function drawFlowers(){
-
-flowers.forEach(f=>f.draw());
-
+    flowers.forEach(f=>f.draw());
 }
