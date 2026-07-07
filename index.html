@@ -2,241 +2,576 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>For Her</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  /* ============================================================
-     EDIT THIS BLOCK to personalize — nothing else needs to change
-     ============================================================ */
-  :root {
-    --her-name: "Her Name";
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 </head>
 <body>
 
-<!-- ============================================================
-     EDIT THESE TWO LINES to personalize the page
-     ============================================================ -->
+<!-- ============================================================================
+     PERSONALIZE HERE — this is the only block you need to edit.
+     ============================================================================ -->
 <script>
   const CONFIG = {
-    name: "Mariyam",
-    message: "I never truly understood what love was. You made me believe it exists, and you made me feel it for the first time<3"
+    name: "Mariyam<3",
+
+    letter: "Before you, I never truly understood what love was. You made me believe it exists, and you made me feel it for the first time. Because of you, I want to become a better man every single day.This little garden is my first gift to you. Right now, it's blooming only through code, colors, and imagination... but one day, I hope we'll build a real one together.Until then, let these flowers bloom just for you.With all my heart, Tonoy",
+
+    question: "Will you be mine, forever?",
+    yesResponse: "Forever it is. \u2661",
+
+    // Optional: add your own legally-owned audio file in the same folder as this
+    // file, then put its filename here (e.g. "song.mp3"). Leave blank for none.
+    musicFile: "",
+    musicCredit: "Her — JVKE"
   };
 </script>
 
-<main class="stage">
-  <div class="flower-wrap">
-    <svg class="flower" viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- stem -->
-      <path class="stem" d="M120 300 C120 230 118 190 120 150" stroke="#4A5D45" stroke-width="2" stroke-linecap="round"/>
-      <!-- leaves -->
-      <path class="leaf leaf-left" d="M120 220 C 90 215 72 195 68 168 C 100 168 118 190 120 220 Z" stroke="#4A5D45" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-      <path class="leaf leaf-right" d="M121 245 C 152 240 170 220 174 193 C 142 193 123 215 121 245 Z" stroke="#4A5D45" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+<!-- persistent ambient layers -->
+<div id="sky"></div>
+<div id="bokeh-layer"></div>
+<div id="petal-overlay"></div>
 
-      <!-- blossom group -->
-      <g class="bloom" transform="translate(120,95)">
-        <!-- 5 petals, drawn then filled -->
-        <path class="petal p1" d="M0,0 C -6,-28 -34,-40 -46,-18 C -54,-2 -34,18 0,0 Z"/>
-        <path class="petal p2" d="M0,0 C 24,-18 52,-8 46,16 C 40,34 12,26 0,0 Z"/>
-        <path class="petal p3" d="M0,0 C 18,22 10,50 -14,48 C -34,46 -30,18 0,0 Z"/>
-        <path class="petal p4" d="M0,0 C -18,24 -46,20 -46,-4 C -46,-22 -22,-20 0,0 Z"/>
-        <path class="petal p5" d="M0,0 C 6,-30 -10,-52 -32,-40 C -46,-30 -26,-8 0,0 Z"/>
-        <circle class="center" cx="0" cy="0" r="7"/>
-      </g>
-    </svg>
-  </div>
+<button id="musicToggle" aria-label="Toggle music">
+  <span class="note">&#9834;</span>
+</button>
+<audio id="bgAudio" loop></audio>
 
-  <div class="type">
-    <p class="eyebrow">for</p>
-    <h1 class="name" id="nameOut"></h1>
-    <p class="message" id="msgOut"></p>
-  </div>
+<div id="preloader">
+  <svg class="pre-flower" viewBox="0 0 100 100" width="54" height="54">
+    <circle cx="50" cy="50" r="34" fill="none" stroke="#C9A961" stroke-width="2" stroke-dasharray="10 8" stroke-linecap="round"/>
+  </svg>
+  <p>preparing something for you</p>
+</div>
+
+<main id="app">
+
+  <!-- SCENE 1: garden -->
+  <section class="scene" id="scene-garden" data-active="true">
+    <div class="parallax-layer" id="gardenFlowers"></div>
+    <p class="hint" id="gardenHint">tap anywhere</p>
+  </section>
+
+  <!-- SCENE 2: bouquet + envelope -->
+  <section class="scene" id="scene-bouquet">
+    <div class="bouquet-wrap" id="bouquetWrap">
+      <svg class="bouquet" viewBox="0 0 260 240" id="bouquetSvg"></svg>
+      <div class="envelope-wrap" id="envelopeWrap">
+        <svg class="envelope" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+          <rect class="env-body" x="6" y="26" width="208" height="118" rx="4" fill="#171310" stroke="#C9A961" stroke-width="1.4"/>
+          <path class="env-fold-left" d="M6 30 L110 96 L6 140 Z" fill="#100D0A" opacity="0.55"/>
+          <path class="env-fold-right" d="M214 30 L110 96 L214 140 Z" fill="#100D0A" opacity="0.55"/>
+          <path class="env-flap" d="M6 26 L110 94 L214 26 L214 26 L110 104 L6 26 Z" fill="#1C1712" stroke="#C9A961" stroke-width="1.4" stroke-linejoin="round" style="transform-origin: 110px 26px;"/>
+          <circle class="env-seal" cx="110" cy="84" r="11" fill="#C9A961"/>
+        </svg>
+        <p class="hint hint-sm">tap the envelope</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4: letter -->
+  <section class="scene" id="scene-letter">
+    <div class="letter-card">
+      <p class="eyebrow">to</p>
+      <h1 class="name" id="nameOut"></h1>
+      <p class="letter-body" id="letterOut"></p>
+      <button class="continue-btn" id="letterContinueBtn">continue &#8594;</button>
+    </div>
+  </section>
+
+  <!-- SCENE 5: proposal -->
+  <section class="scene" id="scene-proposal">
+    <div class="proposal-card" id="proposalCard">
+      <p class="question" id="questionOut"></p>
+      <div class="btn-field" id="btnField">
+        <button class="yes-btn" id="yesBtn">yes</button>
+        <button class="no-btn" id="noBtn"><span class="no-btn-inner">no</span></button>
+      </div>
+    </div>
+    <div class="celebration" id="celebration">
+      <p class="celebration-text" id="celebrationText"></p>
+      <p class="celebration-credit" id="celebrationCredit"></p>
+    </div>
+  </section>
+
 </main>
 
 <script>
-  document.getElementById('nameOut').textContent = CONFIG.name;
-  document.getElementById('msgOut').textContent = CONFIG.message;
+/* ============================================================
+   fill in text
+   ============================================================ */
+document.getElementById('nameOut').textContent = CONFIG.name;
+document.getElementById('letterOut').textContent = CONFIG.letter;
+document.getElementById('questionOut').textContent = CONFIG.question;
+document.getElementById('celebrationText').textContent = CONFIG.yesResponse;
+if (CONFIG.musicFile) {
+  document.getElementById('bgAudio').src = CONFIG.musicFile;
+  document.getElementById('celebrationCredit').textContent = CONFIG.musicCredit || '';
+} else {
+  document.getElementById('musicToggle').style.display = 'none';
+}
+
+/* ============================================================
+   stars + bokeh background
+   ============================================================ */
+const sky = document.getElementById('sky');
+for (let i = 0; i < 60; i++) {
+  const s = document.createElement('span');
+  s.className = 'star';
+  s.style.left = Math.random() * 100 + 'vw';
+  s.style.top = Math.random() * 60 + 'vh';
+  s.style.animationDelay = (Math.random() * 4) + 's';
+  s.style.opacity = 0.2 + Math.random() * 0.6;
+  const size = 1 + Math.random() * 1.6;
+  s.style.width = size + 'px';
+  s.style.height = size + 'px';
+  sky.appendChild(s);
+}
+
+const bokehLayer = document.getElementById('bokeh-layer');
+const bokehColors = ['#E8A0B4','#D9C39A','#C9A6D9','#F2C79E','#A7C0B0'];
+for (let i = 0; i < 16; i++) {
+  const el = document.createElement('div');
+  el.className = 'bokeh';
+  const size = 50 + Math.random() * 130;
+  const color = bokehColors[Math.floor(Math.random() * bokehColors.length)];
+  el.style.width = size + 'px';
+  el.style.height = size + 'px';
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.top = Math.random() * 55 + 'vh';
+  el.style.background = `radial-gradient(circle, ${color}AA 0%, ${color}44 45%, transparent 72%)`;
+  el.style.animationDuration = (12 + Math.random() * 14) + 's';
+  el.style.animationDelay = (Math.random() * -20) + 's';
+  el.style.setProperty('--dx', (Math.random() * 50 - 25) + 'px');
+  el.style.setProperty('--dy', (Math.random() * 50 - 25) + 'px');
+  bokehLayer.appendChild(el);
+}
+
+/* continuous drifting petals across whole page */
+const petalOverlay = document.getElementById('petal-overlay');
+function spawnAmbientPetal() {
+  const p = document.createElement('span');
+  p.className = 'ambient-petal';
+  const colors = ['#E8A0B4','#D9C39A','#C9A6D9','#F2C79E'];
+  p.style.background = colors[Math.floor(Math.random() * colors.length)];
+  p.style.left = Math.random() * 100 + 'vw';
+  const size = 5 + Math.random() * 7;
+  p.style.width = size + 'px';
+  p.style.height = size + 'px';
+  p.style.animationDuration = (9 + Math.random() * 8) + 's';
+  petalOverlay.appendChild(p);
+  setTimeout(() => p.remove(), 18000);
+}
+setInterval(spawnAmbientPetal, 1400);
+for (let i = 0; i < 6; i++) setTimeout(spawnAmbientPetal, i * 500);
+
+/* ============================================================
+   flower SVG generator (used in garden + bouquet)
+   ============================================================ */
+let gradId = 0;
+function flowerMarkup(type, x, groundY, scale) {
+  gradId++;
+  const gA = `gA${gradId}`, gB = `gB${gradId}`;
+  const stemH = 90 * scale;
+  let petals = '';
+  let defs = '';
+  if (type === 'blossom') {
+    defs = `<radialGradient id="${gA}" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#FBEAEF"/><stop offset="55%" stop-color="#F3C6D3"/><stop offset="100%" stop-color="#E38FA6"/>
+    </radialGradient>`;
+    petals = `
+      <g class="bloom-group">
+        <path class="petal" d="M0,0 C -7,-30 -36,-42 -48,-19 C -57,-2 -36,19 0,0 Z" fill="url(#${gA})" stroke="#C9738F" stroke-width="1"/>
+        <path class="petal" d="M0,0 C 25,-19 55,-9 49,17 C 42,36 13,27 0,0 Z" fill="url(#${gA})" stroke="#C9738F" stroke-width="1"/>
+        <path class="petal" d="M0,0 C 19,23 11,52 -15,50 C -36,48 -32,19 0,0 Z" fill="url(#${gA})" stroke="#C9738F" stroke-width="1"/>
+        <path class="petal" d="M0,0 C -19,25 -48,21 -48,-4 C -48,-23 -23,-21 0,0 Z" fill="url(#${gA})" stroke="#C9738F" stroke-width="1"/>
+        <path class="petal" d="M0,0 C 6,-31 -11,-54 -34,-42 C -48,-31 -27,-8 0,0 Z" fill="url(#${gA})" stroke="#C9738F" stroke-width="1"/>
+        <circle class="center" cx="0" cy="0" r="7" fill="#D9A441"/>
+      </g>`;
+  } else if (type === 'rose') {
+    defs = `<radialGradient id="${gA}" cx="40%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#D6597A"/><stop offset="60%" stop-color="#A93A5C"/><stop offset="100%" stop-color="#7B2D42"/>
+    </radialGradient>`;
+    petals = `
+      <g class="bloom-group">
+        <circle cx="0" cy="0" r="22" fill="url(#${gA})" stroke="#5E2233" stroke-width="1"/>
+        <path class="petal" d="M0,-20 C 14,-24 20,-8 8,2 C -2,10 -10,-2 0,-20 Z" fill="url(#${gA})" stroke="#5E2233" stroke-width="0.8" opacity="0.95"/>
+        <path class="petal" d="M18,-4 C 26,8 14,20 2,12 C -6,6 4,-6 18,-4 Z" fill="url(#${gA})" stroke="#5E2233" stroke-width="0.8" opacity="0.95"/>
+        <path class="petal" d="M6,20 C -8,26 -20,12 -10,0 C -2,-8 8,4 6,20 Z" fill="url(#${gA})" stroke="#5E2233" stroke-width="0.8" opacity="0.95"/>
+        <path class="petal" d="M-18,4 C -28,-6 -18,-20 -4,-12 C 4,-6 -4,6 -18,4 Z" fill="url(#${gA})" stroke="#5E2233" stroke-width="0.8" opacity="0.95"/>
+      </g>`;
+  } else { // daisy
+    defs = `<radialGradient id="${gB}" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#FFFDF7"/><stop offset="100%" stop-color="#F1E9D6"/>
+    </radialGradient>`;
+    let ps = '';
+    for (let i = 0; i < 10; i++) {
+      const ang = (360 / 10) * i;
+      ps += `<ellipse class="petal" cx="0" cy="-19" rx="5" ry="15" fill="url(#${gB})" stroke="#D8CBA8" stroke-width="0.6" transform="rotate(${ang})"/>`;
+    }
+    petals = `<g class="bloom-group">${ps}<circle class="center" cx="0" cy="0" r="8" fill="#E3B94B"/></g>`;
+  }
+  return `
+    <defs>${defs}</defs>
+    <g class="flower-instance" transform="translate(${x},${groundY})">
+      <path class="stem" d="M0,0 C -2,${-stemH*0.4} 2,${-stemH*0.7} 0,${-stemH}" stroke="#3E5C46" stroke-width="${2.2*scale}" fill="none" stroke-linecap="round"/>
+      <path class="leaf" d="M0,${-stemH*0.45} C -18,${-stemH*0.42} -30,${-stemH*0.55} -32,${-stemH*0.7} C -10,${-stemH*0.68} 2,${-stemH*0.58} 0,${-stemH*0.45} Z" fill="none" stroke="#3E5C46" stroke-width="${1.4*scale}"/>
+      <g transform="translate(0,${-stemH}) scale(${scale})">${petals}</g>
+    </g>`;
+}
+
+/* populate garden */
+const gardenFlowers = document.getElementById('gardenFlowers');
+const gardenSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+gardenSvg.setAttribute('viewBox','0 0 400 300');
+gardenSvg.setAttribute('preserveAspectRatio','xMidYMax meet');
+gardenSvg.classList.add('garden-svg');
+const types = ['blossom','rose','daisy','blossom','rose'];
+const positions = [70, 150, 200, 260, 335];
+positions.forEach((x, i) => {
+  const scale = 0.85 + Math.random() * 0.4;
+  gardenSvg.innerHTML += flowerMarkup(types[i % types.length], x, 295, scale);
+});
+gardenFlowers.appendChild(gardenSvg);
+
+/* bloom-in animation for garden, staggered */
+function animateBlooms(root, baseDelay) {
+  const stems = root.querySelectorAll('.stem');
+  const leaves = root.querySelectorAll('.leaf');
+  const petalGroups = root.querySelectorAll('.bloom-group');
+  stems.forEach((s, i) => {
+    const len = s.getTotalLength ? s.getTotalLength() : 100;
+    s.style.strokeDasharray = len;
+    s.style.strokeDashoffset = len;
+    anime({ targets: s, strokeDashoffset: 0, duration: 1100, easing: 'easeOutCubic', delay: baseDelay + i * 220 });
+  });
+  leaves.forEach((l, i) => {
+    l.style.opacity = 0;
+    anime({ targets: l, opacity: 1, duration: 700, easing: 'easeOutQuad', delay: baseDelay + 500 + i * 220 });
+  });
+  petalGroups.forEach((g, i) => {
+    g.style.transformBox = 'fill-box';
+    g.style.transformOrigin = 'center';
+    anime({
+      targets: g,
+      scale: [0.2, 1],
+      opacity: [0, 1],
+      rotate: [-10, 0],
+      duration: 900,
+      easing: 'easeOutElastic(1, .7)',
+      delay: baseDelay + 900 + i * 220
+    });
+  });
+}
+animateBlooms(gardenSvg, 300);
+
+anime({ targets: '#gardenHint', opacity: [0,1], duration: 1200, easing: 'easeOutQuad', delay: 2600 });
+
+/* subtle parallax on pointer move for garden */
+document.getElementById('scene-garden').addEventListener('pointermove', (e) => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 14;
+  const y = (e.clientY / window.innerHeight - 0.5) * 8;
+  gardenFlowers.style.transform = `translate(${x}px, ${y}px)`;
+  bokehLayer.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px)`;
+});
+
+/* ============================================================
+   scene management
+   ============================================================ */
+const sceneOrder = ['scene-garden','scene-bouquet','scene-letter','scene-proposal'];
+function goToScene(id) {
+  sceneOrder.forEach(s => document.getElementById(s).removeAttribute('data-active'));
+  document.getElementById(id).setAttribute('data-active','true');
+  document.body.setAttribute('data-scene', id);
+}
+
+document.getElementById('scene-garden').addEventListener('click', () => {
+  goToScene('scene-bouquet');
+  buildBouquet();
+});
+
+/* ============================================================
+   bouquet
+   ============================================================ */
+let bouquetBuilt = false;
+function buildBouquet() {
+  if (bouquetBuilt) return;
+  bouquetBuilt = true;
+  const svg = document.getElementById('bouquetSvg');
+  const layout = [
+    {type:'rose', x:90, y:180, scale:0.62},
+    {type:'blossom', x:130, y:170, scale:0.7},
+    {type:'daisy', x:170, y:182, scale:0.55},
+    {type:'blossom', x:110, y:150, scale:0.55},
+    {type:'rose', x:150, y:148, scale:0.5}
+  ];
+  layout.forEach(f => { svg.innerHTML += flowerMarkup(f.type, f.x, f.y, f.scale); });
+  svg.innerHTML += `<path d="M60,200 Q130,235 200,200 L195,215 Q130,248 65,215 Z" fill="#C9A961" opacity="0.9"/>`;
+  animateBlooms(svg, 100);
+  anime({ targets: '#envelopeWrap', opacity: [0,1], translateY: [16,0], duration: 900, easing: 'easeOutCubic', delay: 1900 });
+}
+
+const envelopeWrap = document.getElementById('envelopeWrap');
+envelopeWrap.addEventListener('click', () => {
+  if (envelopeWrap.classList.contains('opened')) return;
+  envelopeWrap.classList.add('opened');
+  setTimeout(() => goToScene('scene-letter'), 950);
+});
+
+document.getElementById('letterContinueBtn').addEventListener('click', () => {
+  goToScene('scene-proposal');
+});
+
+/* ============================================================
+   dodging "no" button
+   ============================================================ */
+const btnField = document.getElementById('btnField');
+const noBtn = document.getElementById('noBtn');
+const noBtnInner = noBtn.querySelector('.no-btn-inner');
+const yesBtn = document.getElementById('yesBtn');
+const noLabels = ['no','nope','not quite','try again','almost','nice try','so close','never','not today','keep trying'];
+let labelIndex = 0;
+let lastMoveTime = 0;
+
+function relocateNoBtn(cycleLabel = true) {
+  const fieldRect = btnField.getBoundingClientRect();
+  const btnW = noBtn.offsetWidth, btnH = noBtn.offsetHeight;
+  const padding = 8;
+  const maxX = Math.max(fieldRect.width - btnW - padding, padding);
+  const maxY = Math.max(fieldRect.height - btnH - padding, padding);
+  let newX, newY, tries = 0;
+  const yesRect = yesBtn.getBoundingClientRect();
+  do {
+    newX = padding + Math.random() * (maxX - padding);
+    newY = padding + Math.random() * (maxY - padding);
+    tries++;
+  } while (
+    tries < 12 &&
+    Math.abs((fieldRect.left + newX) - yesRect.left) < 90 &&
+    Math.abs((fieldRect.top + newY) - yesRect.top) < 60
+  );
+  noBtn.style.left = newX + 'px';
+  noBtn.style.top = newY + 'px';
+  if (cycleLabel) {
+    labelIndex = (labelIndex + 1) % noLabels.length;
+    noBtnInner.textContent = noLabels[labelIndex];
+  }
+}
+
+// bigger reaction radius, fires sooner, throttled just enough to stay smooth
+function maybeDodge(clientX, clientY) {
+  if (document.body.getAttribute('data-scene') !== 'scene-proposal') return;
+  const now = Date.now();
+  if (now - lastMoveTime < 60) return;
+  const rect = noBtn.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const dist = Math.hypot(clientX - cx, clientY - cy);
+  const threshold = rect.width * 2.3 + 60;
+  if (dist < threshold) { lastMoveTime = now; relocateNoBtn(); }
+}
+
+document.addEventListener('pointermove', (e) => maybeDodge(e.clientX, e.clientY));
+document.addEventListener('touchmove', (e) => {
+  if (e.touches && e.touches[0]) maybeDodge(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+
+noBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); relocateNoBtn(); });
+noBtn.addEventListener('click', (e) => { e.preventDefault(); relocateNoBtn(); });
+
+// never fully at rest: small unprompted repositioning even without a chasing cursor
+setInterval(() => {
+  if (document.body.getAttribute('data-scene') !== 'scene-proposal') return;
+  if (Date.now() - lastMoveTime < 1800) return; // don't fight an active chase
+  relocateNoBtn(false);
+}, 2600);
+
+yesBtn.addEventListener('click', () => {
+  document.getElementById('proposalCard').style.display = 'none';
+  const cel = document.getElementById('celebration');
+  cel.setAttribute('data-active', 'true');
+  spawnCelebrationPetals();
+  if (CONFIG.musicFile) {
+    document.getElementById('bgAudio').play().catch(()=>{});
+    document.getElementById('musicToggle').classList.add('playing');
+  }
+});
+
+function spawnCelebrationPetals() {
+  const container = document.getElementById('celebration');
+  const colors = ['#E8A0B4','#D9C39A','#C9A6D9','#F2C79E'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('span');
+    p.className = 'petal-fall';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDuration = (3.5 + Math.random() * 3) + 's';
+    p.style.animationDelay = (Math.random() * 1.2) + 's';
+    p.style.width = p.style.height = (6 + Math.random() * 8) + 'px';
+    container.appendChild(p);
+  }
+}
+
+/* ============================================================
+   music toggle
+   ============================================================ */
+const musicToggle = document.getElementById('musicToggle');
+const bgAudio = document.getElementById('bgAudio');
+musicToggle.addEventListener('click', () => {
+  if (!CONFIG.musicFile) return;
+  if (bgAudio.paused) { bgAudio.play().catch(()=>{}); musicToggle.classList.add('playing'); }
+  else { bgAudio.pause(); musicToggle.classList.remove('playing'); }
+});
+
+/* ============================================================
+   preloader
+   ============================================================ */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const pre = document.getElementById('preloader');
+    pre.style.opacity = '0';
+    setTimeout(() => pre.style.display = 'none', 600);
+  }, 900);
+});
 </script>
 
 <style>
   :root {
-    --bg: #FAF7F1;
-    --ink: #2B2B27;
-    --sage: #4A5D45;
-    --gold: #B9975B;
-    --gold-soft: #D9C39A;
-    --paper-edge: #EFE9DD;
+    --ink: #F5F1E8;
+    --gold: #C9A961;
+    --gold-soft: #E3CFA0;
+    --sky-top: #05060A;
+    --sky-mid: #14101F;
+    --sky-bot: #0A0A0C;
   }
 
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; background: var(--sky-bot); overflow: hidden; }
+  body { color: var(--ink); font-family: 'Jost', sans-serif; position: relative; }
 
-  html, body {
-    height: 100%;
-    margin: 0;
+  /* ---------- preloader ---------- */
+  #preloader {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--sky-bot);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    transition: opacity 0.6s ease;
+  }
+  .pre-flower circle { animation: spin 1.4s linear infinite; transform-origin: center; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #preloader p { font-size: 0.72rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold-soft); opacity: 0.8; }
+
+  /* ---------- sky / stars ---------- */
+  #sky {
+    position: fixed; inset: 0; z-index: 0;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 45%, var(--sky-bot) 100%);
+  }
+  .star { position: absolute; border-radius: 50%; background: #FFF7E6; animation: twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle { 0%,100% { opacity: 0.2; } 50% { opacity: 0.9; } }
+
+  /* ---------- bokeh ---------- */
+  #bokeh-layer { position: fixed; inset: 0; z-index: 1; filter: blur(7px); transition: opacity 1s ease, filter 1s ease, transform 0.3s ease-out; }
+  body[data-scene="scene-story"] #bokeh-layer,
+  body[data-scene="scene-bouquet"] #bokeh-layer,
+  body[data-scene="scene-letter"] #bokeh-layer,
+  body[data-scene="scene-proposal"] #bokeh-layer { opacity: 0.3; filter: blur(11px); }
+  .bokeh { position: absolute; border-radius: 50%; animation-name: drift; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-direction: alternate; }
+  @keyframes drift {
+    0%   { transform: translate(0,0) scale(1); opacity: 0.5; }
+    50%  { transform: translate(var(--dx), var(--dy)) scale(1.15); opacity: 0.8; }
+    100% { transform: translate(calc(var(--dx) * -1), calc(var(--dy) * -1)) scale(0.95); opacity: 0.45; }
   }
 
-  body {
-    background: radial-gradient(120% 100% at 50% 0%, #FFFDF9 0%, var(--bg) 55%, #F3EEE2 100%);
-    color: var(--ink);
-    font-family: 'Jost', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 6vh 6vw;
-    overflow-x: hidden;
+  /* ---------- ambient petals ---------- */
+  #petal-overlay { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+  .ambient-petal { position: absolute; top: -20px; border-radius: 50% 0 50% 50%; opacity: 0.55; animation: ambientFall linear forwards; }
+  @keyframes ambientFall {
+    0% { transform: translateY(-5vh) translateX(0) rotate(0deg); }
+    100% { transform: translateY(105vh) translateX(40px) rotate(260deg); opacity: 0.15; }
   }
 
-  .stage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 520px;
-    width: 100%;
+  /* ---------- music toggle ---------- */
+  #musicToggle {
+    position: fixed; bottom: 18px; right: 18px; z-index: 50;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(20,17,13,0.65); border: 1px solid var(--gold);
+    color: var(--gold-soft); font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
   }
+  #musicToggle .note { animation: none; }
+  #musicToggle.playing .note { animation: bob 1s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
-  .flower-wrap {
-    width: 200px;
-    max-width: 60vw;
-    margin-bottom: 2.2rem;
+  /* ---------- app / scenes ---------- */
+  #app { position: relative; z-index: 3; height: 100vh; width: 100vw; }
+  .scene {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.9s ease;
+    padding: 6vh 6vw; text-align: center;
   }
+  .scene[data-active="true"] { opacity: 1; pointer-events: auto; }
 
-  .flower { width: 100%; height: auto; overflow: visible; }
+  #scene-garden { cursor: pointer; }
+  .parallax-layer { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; transition: transform 0.15s ease-out; }
+  .garden-svg { width: min(100%, 720px); height: 62vh; }
 
-  /* --- stem draw-in --- */
-  .stem {
-    stroke-dasharray: 160;
-    stroke-dashoffset: 160;
-    animation: draw 1.6s ease-out forwards;
+  .hint { font-size: 0.72rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold-soft); opacity: 0; position: relative; z-index: 2; margin-top: auto; margin-bottom: 6vh; }
+  .hint-sm { margin-top: 1.2rem; margin-bottom: 0; font-size: 0.66rem; opacity: 0.7; }
+
+  .eyebrow { font-size: 0.7rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold); margin: 0 0 1.6rem; }
+
+  .continue-btn {
+    background: none; border: 1px solid var(--gold); color: var(--gold-soft);
+    font-family: 'Jost', sans-serif; font-size: 0.8rem; letter-spacing: 0.14em;
+    padding: 0.7rem 1.4rem; border-radius: 999px; cursor: pointer; opacity: 0;
+    transition: background 0.3s ease, color 0.3s ease;
   }
+  .continue-btn:hover { background: var(--gold); color: #14110D; }
 
-  /* --- leaves draw-in, staggered --- */
-  .leaf {
-    stroke-dasharray: 140;
-    stroke-dashoffset: 140;
-    animation: draw 1.2s ease-out forwards;
-  }
-  .leaf-left { animation-delay: 0.9s; }
-  .leaf-right { animation-delay: 1.05s; }
+  /* ---------- bouquet + envelope ---------- */
+  .bouquet-wrap { position: relative; width: min(90vw, 420px); display: flex; flex-direction: column; align-items: center; }
+  .bouquet { width: 78%; height: auto; overflow: visible; }
+  .envelope-wrap { cursor: pointer; opacity: 0; width: min(58vw, 260px); margin-top: -1.5rem; }
+  .envelope { width: 100%; height: auto; overflow: visible; }
+  .env-flap { transition: transform 0.8s cubic-bezier(.6,.1,.3,1); }
+  .env-seal { transition: opacity 0.3s ease; }
+  .envelope-wrap.opened .env-flap { transform: rotateX(180deg); }
+  .envelope-wrap.opened .env-seal { opacity: 0; }
+  .envelope-wrap.opened .hint-sm { opacity: 0; }
 
-  @keyframes draw {
-    to { stroke-dashoffset: 0; }
-  }
+  /* ---------- letter ---------- */
+  .letter-card { max-width: 480px; background: linear-gradient(180deg, #14110D 0%, #0F0D0A 100%); border: 1px solid #2A2419; border-radius: 6px; padding: 3rem 2.4rem; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
+  .name { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(1.9rem, 5vw, 2.6rem); margin: 0 0 1.4rem; color: var(--ink); }
+  .name::after { content: ""; display: block; width: 40px; height: 1px; background: var(--gold); margin: 0.8rem auto 0; }
+  .letter-body { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(1.05rem, 2.4vw, 1.25rem); line-height: 1.85; color: #D8D2C4; margin: 0 0 2rem; }
 
-  /* --- bloom: petals unfurl from center --- */
-  .bloom {
-    transform-origin: 0px 0px;
-  }
+  /* ---------- proposal ---------- */
+  .proposal-card { max-width: 420px; width: 100%; }
+  .question { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(1.8rem, 5.5vw, 2.5rem); margin: 0 0 2.6rem; color: var(--ink); }
+  .btn-field { position: relative; height: 130px; width: 100%; }
+  .yes-btn, .no-btn { font-family: 'Jost', sans-serif; font-size: 0.95rem; letter-spacing: 0.08em; padding: 0.85rem 2.2rem; border-radius: 999px; cursor: pointer; border: 1px solid var(--gold); background: none; color: var(--gold-soft); }
+  .yes-btn { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); background: var(--gold); color: #14110D; font-weight: 500; z-index: 3; }
+  .no-btn { position: absolute; left: 50%; top: 90px; transform: translateX(-50%); transition: left 0.18s ease, top 0.18s ease; z-index: 2; }
+  .no-btn-inner { display: inline-block; animation: noJitter 1.8s ease-in-out infinite; }
+  @keyframes noJitter { 0%,100% { transform: translateY(0) rotate(0deg); } 30% { transform: translateY(-2px) rotate(-2deg); } 60% { transform: translateY(1px) rotate(2deg); } }
 
-  .petal {
-    fill: var(--gold-soft);
-    stroke: var(--gold);
-    stroke-width: 1.4;
-    opacity: 0;
-    transform: scale(0.15) rotate(-8deg);
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: unfurl 1.1s cubic-bezier(.22,.9,.32,1) forwards;
-  }
+  .celebration { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+  .celebration[data-active="true"] { display: flex; }
+  .celebration-text { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(2rem, 6vw, 3rem); color: var(--gold-soft); opacity: 0; animation: fadeIn 1.2s ease forwards; animation-delay: 0.3s; }
+  .celebration-credit { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); opacity: 0; animation: fadeIn 1.2s ease forwards; animation-delay: 1s; margin-top: 0.6rem; }
+  @keyframes fadeIn { to { opacity: 1; } }
+  .petal-fall { position: absolute; top: -20px; border-radius: 50% 0 50% 50%; opacity: 0.85; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(300deg); opacity: 0.2; } }
 
-  .p1 { animation-delay: 1.5s; }
-  .p2 { animation-delay: 1.62s; }
-  .p3 { animation-delay: 1.74s; }
-  .p4 { animation-delay: 1.86s; }
-  .p5 { animation-delay: 1.98s; }
-
-  @keyframes unfurl {
-    0%   { opacity: 0; transform: scale(0.15) rotate(-8deg); }
-    60%  { opacity: 1; }
-    100% { opacity: 1; transform: scale(1) rotate(0deg); }
-  }
-
-  .center {
-    fill: var(--gold);
-    opacity: 0;
-    animation: fadeIn 0.6s ease-out forwards;
-    animation-delay: 2.3s;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-
-  /* --- type reveal --- */
-  .type { opacity: 0; }
-
-  .eyebrow {
-    font-family: 'Jost', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--sage);
-    margin: 0 0 0.6rem;
-    opacity: 0;
-    animation: fadeUp 0.9s ease-out forwards;
-    animation-delay: 2.6s;
-  }
-
-  .name {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 500;
-    font-size: clamp(2.2rem, 6vw, 3.4rem);
-    margin: 0 0 1.3rem;
-    color: var(--ink);
-    letter-spacing: 0.01em;
-    opacity: 0;
-    animation: fadeUp 1s ease-out forwards;
-    animation-delay: 2.85s;
-  }
-
-  .name::after {
-    content: "";
-    display: block;
-    width: 42px;
-    height: 1px;
-    background: var(--gold);
-    margin: 0.9rem auto 0;
-  }
-
-  .message {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: clamp(1.05rem, 2.6vw, 1.3rem);
-    line-height: 1.7;
-    color: #4A4A42;
-    margin: 0;
-    opacity: 0;
-    animation: fadeUp 1.1s ease-out forwards;
-    animation-delay: 3.15s;
-  }
-
-  .type {
-    animation: fadeIn 0.1s forwards;
-    animation-delay: 2.5s;
-  }
-
-  @keyframes fadeUp {
-    0%   { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
+  @media (max-width: 480px) {
+    .story-cards { max-height: 46vh; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .stem, .leaf, .petal, .center, .eyebrow, .name, .message, .type {
-      animation: none !important;
-      opacity: 1 !important;
-      stroke-dashoffset: 0 !important;
-      transform: none !important;
-    }
-  }
-
-  @media (max-width: 420px) {
-    body { padding: 8vh 8vw; }
+    .bokeh, .star, .ambient-petal, .hint, .celebration-text, .petal-fall { animation: none !important; opacity: 1 !important; }
   }
 </style>
 
