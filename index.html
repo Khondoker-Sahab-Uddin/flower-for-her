@@ -516,10 +516,10 @@ window.addEventListener('load', () => {
 
   #scene-garden { cursor: pointer; }
   .parallax-layer { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; transition: transform 0.15s ease-out; }
-  .garden-svg { width: min(100%, 720px); height: 62vh; }
+  .garden-svg { width: min(100%, 720px); height: auto; max-height: 68vh; overflow: visible; }
 
   .hint { font-size: 0.72rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold-soft); opacity: 0; position: relative; z-index: 2; margin-top: auto; margin-bottom: 6vh; }
-  .hint-sm { margin-top: 1.2rem; margin-bottom: 0; font-size: 0.66rem; opacity: 0.7; }
+  .hint-sm { margin-top: 1.2rem; margin-bottom: 0; font-size: 0.66rem; opacity: 1; transition: opacity 0.5s ease; }
 
   .eyebrow { font-size: 0.7rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold); margin: 0 0 1.6rem; }
 
@@ -527,8 +527,9 @@ window.addEventListener('load', () => {
     background: none; border: 1px solid var(--gold); color: var(--gold-soft);
     font-family: 'Jost', sans-serif; font-size: 0.8rem; letter-spacing: 0.14em;
     padding: 0.7rem 1.4rem; border-radius: 999px; cursor: pointer; opacity: 0;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: opacity 0.8s ease 0.9s, background 0.3s ease, color 0.3s ease;
   }
+  .scene[data-active="true"] .continue-btn { opacity: 1; }
   .continue-btn:hover { background: var(--gold); color: #14110D; }
 
   /* ---------- bouquet + envelope ---------- */
