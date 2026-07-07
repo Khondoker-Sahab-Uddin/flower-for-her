@@ -1,68 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>For Mariyam ✨</title>
-
+<title>For Her</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="style.css">
-
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     EDIT THIS BLOCK to personalize — nothing else needs to change
+     ============================================================ */
+  :root {
+    --her-name: "Her Name";
+  }
+</style>
 </head>
-
 <body>
 
-<div id="sky"></div>
-
-<canvas id="canvas"></canvas>
-
-<div id="mist"></div>
-
-<div id="vignette"></div>
-
-<div id="textContainer">
-
-<h1 id="title">Mariyam</h1>
-
-<p id="message">
-You are the most beautiful thing
-that has ever happened to me.
-</p>
-
-<p id="ending">
-Thank you for existing.
-</p>
-
-</div>
-
+<!-- ============================================================
+     EDIT THESE TWO LINES to personalize the page
+     ============================================================ -->
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-let w = 0;
-let h = 0;
-
-function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-}
-
-resize();
-window.addEventListener("resize", resize);
+  const CONFIG = {
+    name: "Mariyam",
+    message: "I never truly understood what love was. You made me believe it exists, and you made me feel it for the first time<3"
+  };
 </script>
 
-<script src="particles.js"></script>
-<script src="flowers.js"></script>
-<script src="text.js"></script>
-<script src="script.js"></script>
+<main class="stage">
+  <div class="flower-wrap">
+    <svg class="flower" viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- stem -->
+      <path class="stem" d="M120 300 C120 230 118 190 120 150" stroke="#4A5D45" stroke-width="2" stroke-linecap="round"/>
+      <!-- leaves -->
+      <path class="leaf leaf-left" d="M120 220 C 90 215 72 195 68 168 C 100 168 118 190 120 220 Z" stroke="#4A5D45" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+      <path class="leaf leaf-right" d="M121 245 C 152 240 170 220 174 193 C 142 193 123 215 121 245 Z" stroke="#4A5D45" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+
+      <!-- blossom group -->
+      <g class="bloom" transform="translate(120,95)">
+        <!-- 5 petals, drawn then filled -->
+        <path class="petal p1" d="M0,0 C -6,-28 -34,-40 -46,-18 C -54,-2 -34,18 0,0 Z"/>
+        <path class="petal p2" d="M0,0 C 24,-18 52,-8 46,16 C 40,34 12,26 0,0 Z"/>
+        <path class="petal p3" d="M0,0 C 18,22 10,50 -14,48 C -34,46 -30,18 0,0 Z"/>
+        <path class="petal p4" d="M0,0 C -18,24 -46,20 -46,-4 C -46,-22 -22,-20 0,0 Z"/>
+        <path class="petal p5" d="M0,0 C 6,-30 -10,-52 -32,-40 C -46,-30 -26,-8 0,0 Z"/>
+        <circle class="center" cx="0" cy="0" r="7"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="type">
+    <p class="eyebrow">for</p>
+    <h1 class="name" id="nameOut"></h1>
+    <p class="message" id="msgOut"></p>
+  </div>
+</main>
+
+<script>
+  document.getElementById('nameOut').textContent = CONFIG.name;
+  document.getElementById('msgOut').textContent = CONFIG.message;
+</script>
+
+<style>
+  :root {
+    --bg: #FAF7F1;
+    --ink: #2B2B27;
+    --sage: #4A5D45;
+    --gold: #B9975B;
+    --gold-soft: #D9C39A;
+    --paper-edge: #EFE9DD;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: radial-gradient(120% 100% at 50% 0%, #FFFDF9 0%, var(--bg) 55%, #F3EEE2 100%);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 6vh 6vw;
+    overflow-x: hidden;
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .flower-wrap {
+    width: 200px;
+    max-width: 60vw;
+    margin-bottom: 2.2rem;
+  }
+
+  .flower { width: 100%; height: auto; overflow: visible; }
+
+  /* --- stem draw-in --- */
+  .stem {
+    stroke-dasharray: 160;
+    stroke-dashoffset: 160;
+    animation: draw 1.6s ease-out forwards;
+  }
+
+  /* --- leaves draw-in, staggered --- */
+  .leaf {
+    stroke-dasharray: 140;
+    stroke-dashoffset: 140;
+    animation: draw 1.2s ease-out forwards;
+  }
+  .leaf-left { animation-delay: 0.9s; }
+  .leaf-right { animation-delay: 1.05s; }
+
+  @keyframes draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* --- bloom: petals unfurl from center --- */
+  .bloom {
+    transform-origin: 0px 0px;
+  }
+
+  .petal {
+    fill: var(--gold-soft);
+    stroke: var(--gold);
+    stroke-width: 1.4;
+    opacity: 0;
+    transform: scale(0.15) rotate(-8deg);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: unfurl 1.1s cubic-bezier(.22,.9,.32,1) forwards;
+  }
+
+  .p1 { animation-delay: 1.5s; }
+  .p2 { animation-delay: 1.62s; }
+  .p3 { animation-delay: 1.74s; }
+  .p4 { animation-delay: 1.86s; }
+  .p5 { animation-delay: 1.98s; }
+
+  @keyframes unfurl {
+    0%   { opacity: 0; transform: scale(0.15) rotate(-8deg); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  .center {
+    fill: var(--gold);
+    opacity: 0;
+    animation: fadeIn 0.6s ease-out forwards;
+    animation-delay: 2.3s;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* --- type reveal --- */
+  .type { opacity: 0; }
+
+  .eyebrow {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin: 0 0 0.6rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease-out forwards;
+    animation-delay: 2.6s;
+  }
+
+  .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    margin: 0 0 1.3rem;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    opacity: 0;
+    animation: fadeUp 1s ease-out forwards;
+    animation-delay: 2.85s;
+  }
+
+  .name::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0.9rem auto 0;
+  }
+
+  .message {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+    line-height: 1.7;
+    color: #4A4A42;
+    margin: 0;
+    opacity: 0;
+    animation: fadeUp 1.1s ease-out forwards;
+    animation-delay: 3.15s;
+  }
+
+  .type {
+    animation: fadeIn 0.1s forwards;
+    animation-delay: 2.5s;
+  }
+
+  @keyframes fadeUp {
+    0%   { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stem, .leaf, .petal, .center, .eyebrow, .name, .message, .type {
+      animation: none !important;
+      opacity: 1 !important;
+      stroke-dashoffset: 0 !important;
+      transform: none !important;
+    }
+  }
+
+  @media (max-width: 420px) {
+    body { padding: 8vh 8vw; }
+  }
+</style>
 
 </body>
-
 </html>
